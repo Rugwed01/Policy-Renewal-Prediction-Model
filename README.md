@@ -197,7 +197,7 @@ Automatically computes:
 If you find bugs or want new features:
 
 👉 Submit here:  
-https://github.com/your/repo/issues
+https://github.com/Rugwed01/Policy-Renewal-Prediction-Model/issues
 
 ---
 
