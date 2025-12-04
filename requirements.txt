@@ -1,0 +1,16 @@
+# requirements.txt
+
+# Core Data Science & ML
+pandas
+numpy
+scikit-learn
+joblib
+imbalanced-learn  # For SMOTE
+lightgbm
+catboost
+optuna            # For hyperparameter tuning
+shap              # For XAI
+matplotlib
+
+# Dashboard
+streamlit
