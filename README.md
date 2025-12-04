@@ -9,8 +9,8 @@ A full-stack Machine Learning system for predicting customer policy renewal, ide
 </p>
 
 <p align="center">
-  <a href="#"><img src="https://img.shields.io/github/stars/your/repo?style=social" /></a>
-  <a href="#"><img src="https://img.shields.io/github/forks/your/repo?style=social" /></a>
+  <a href="#"><img src="https://img.shields.io/github/stars/Rugwed01/Policy-Renewal-Prediction-Model?style=social" /></a>
+  <a href="#"><img src="https://img.shields.io/github/forks/Rugwed01/Policy-Renewal-Prediction-Model?style=social" /></a>
 </p>
 
 ---
