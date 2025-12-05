@@ -34,12 +34,6 @@ def load_assets():
     except FileNotFoundError:
         st.error(f"Error: Model file not found at {config.MODEL_FILE}")
         return None, None, None, None
-        
-    try:
-        shap_explainer = joblib.load(config.EXPLAINER_FILE)
-    except FileNotFoundError:
-        st.error(f"Error: SHAP explainer not found at {config.EXPLAINER_FILE}")
-        return model_pipeline, None, None, None
 
     df_raw = load_data(config.DATA_FILE)
     if df_raw is not None:
@@ -65,6 +59,12 @@ def load_assets():
         df_full_processed = pd.concat([df_full_processed, prob_df], axis=1)
     else:
         df_full_processed = None
+
+    # --- FIX: Recreate the explainer on the fly ---
+    # SHAP explainers are not reliably portable across environments.
+    # It's better to recreate it from the loaded model and data.
+    print("Creating SHAP explainer...")
+    shap_explainer = shap.Explainer(model_pipeline.predict_proba, X)
         
     try:
         global_shap_plot = plt.imread(config.GLOBAL_SHAP_PLOT)
