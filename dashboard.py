@@ -63,8 +63,20 @@ def load_assets():
     # --- FIX: Recreate the explainer on the fly ---
     # SHAP explainers are not reliably portable across environments.
     # It's better to recreate it from the loaded model and data.
+    # For a pipeline with preprocessing, we pass the pipeline directly
+    # and let SHAP handle the data transformation.
     print("Creating SHAP explainer...")
-    shap_explainer = shap.Explainer(model_pipeline.predict_proba, X)
+    if df_full_processed is not None:
+        # Create a background sample for the explainer (use a sample of data for efficiency)
+        background_sample = df_full_processed[config.FEATURES_TO_USE].sample(n=min(100, len(df_full_processed)), random_state=42)
+        # Use KernelExplainer which works with any model type
+        shap_explainer = shap.KernelExplainer(
+            model=model_pipeline.predict_proba,
+            data=background_sample,
+            link="logit"
+        )
+    else:
+        shap_explainer = None
         
     try:
         global_shap_plot = plt.imread(config.GLOBAL_SHAP_PLOT)
@@ -79,7 +91,10 @@ def get_shap_explanation(_shap_explainer, customer_data_processed):
     """
     Generates SHAP values for a single customer.
     We cache this computation.
+    The input should be a DataFrame with the feature columns.
     """
+    # Pass the DataFrame directly to the explainer
+    # The KernelExplainer will handle the data transformation
     shap_values = _shap_explainer(customer_data_processed)
     return shap_values
 
@@ -288,7 +303,10 @@ else:
             
             with st.spinner("Generating explanation..."):
                 shap_values_obj = get_shap_explanation(explainer, customer_processed)
-                shap_explanation_sample = shap_values_obj[0]
+                # For multi-output models, extract the explanation for class 1 ("Renewed")
+                # shap_values_obj shape is (num_features, num_classes) for multi-class
+                # We want the first (and only) customer's explanation for class 1
+                shap_explanation_sample = shap_values_obj[0, :, 1]
                 
                 fig, ax = plt.subplots()
                 # Fix for SHAP API change: Pass the Explanation object directly
@@ -309,7 +327,7 @@ else:
         
         if global_shap_plot is not None:
             st.subheader("Top Drivers of Renewal (Model-Wide)")
-            st.image(global_shap_plot, use_container_width=True, 
+            st.image(global_shap_plot, width='stretch', 
                      caption="This SHAP plot shows the average impact of each feature on the model's output (for Class 1: 'Renewed').")
             
             st.subheader("Key Business Takeaways")
